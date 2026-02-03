@@ -1,0 +1,21 @@
+customer_id,first_name,last_name,email,phone,address,registration_date,customer_tier
+1001,John,Smith,john.smith@gmail.com,(555) 100-1000,"100 Main St, New York, NY 10001",2024-01-01,Bronze
+1002,Jane,Johnson,jane.johnson@yahoo.com,(556) 101-1001,"101 Main St, Los Angeles, CA 10002",2024-02-02,Silver
+1003,Michael,Williams,michael.williams@outlook.com,(557) 102-1002,"102 Main St, Chicago, IL 10003",2024-03-03,Gold
+1004,Sarah,Brown,sarah.brown@hotmail.com,(558) 103-1003,"103 Main St, Houston, TX 10004",2024-04-04,Platinum
+1005,David,Jones,david.jones@gmail.com,(559) 104-1004,"104 Main St, Phoenix, AZ 10005",2024-05-05,Bronze
+1006,Emily,Garcia,emily.garcia@yahoo.com,(560) 105-1005,"105 Main St, New York, NY 10006",2024-06-06,Silver
+1007,Robert,Miller,robert.miller@outlook.com,(561) 106-1006,"106 Main St, Los Angeles, CA 10007",2024-07-07,Gold
+1008,Jessica,Davis,jessica.davis@hotmail.com,(562) 107-1007,"107 Main St, Chicago, IL 10008",2024-08-08,Platinum
+1009,William,Rodriguez,william.rodriguez@gmail.com,(563) 108-1008,"108 Main St, Houston, TX 10009",2024-09-09,Bronze
+1010,Ashley,Martinez,ashley.martinez@yahoo.com,(564) 109-1009,"109 Main St, Phoenix, AZ 10010",2024-10-10,Silver
+1011,James,Hernandez,james.hernandez@outlook.com,(565) 110-1010,"110 Main St, New York, NY 10011",2024-11-11,Gold
+1012,Amanda,Lopez,amanda.lopez@hotmail.com,(566) 111-1011,"111 Main St, Los Angeles, CA 10012",2024-12-12,Platinum
+1013,Christopher,Gonzalez,christopher.gonzalez@gmail.com,(567) 112-1012,"112 Main St, Chicago, IL 10013",2024-01-13,Bronze
+1014,Jennifer,Smith,jennifer.smith@yahoo.com,(568) 113-1013,"113 Main St, Houston, TX 10014",2024-02-14,Silver
+1015,Daniel,Johnson,daniel.johnson@outlook.com,(569) 114-1014,"114 Main St, Phoenix, AZ 10015",2024-03-15,Gold
+1016,John,Williams,john.williams@hotmail.com,(570) 115-1015,"115 Main St, New York, NY 10016",2024-04-16,Platinum
+1017,Jane,Brown,jane.brown@gmail.com,(571) 116-1016,"116 Main St, Los Angeles, CA 10017",2024-05-17,Bronze
+1018,Michael,Jones,michael.jones@yahoo.com,(572) 117-1017,"117 Main St, Chicago, IL 10018",2024-06-18,Silver
+1019,Sarah,Garcia,sarah.garcia@outlook.com,(573) 118-1018,"118 Main St, Houston, TX 10019",2024-07-19,Gold
+1020,David,Miller,david.miller@hotmail.com,(574) 119-1019,"119 Main St, Phoenix, AZ 10020",2024-08-20,Platinum
