@@ -1,0 +1,21 @@
+product_id,product_name,category,price,description,stock_quantity,brand,rating
+2001,Premium Product 1,Electronics,$19.99,High-quality product with advanced features and excellent performance,50,BrandA,3.0
+2002,Premium Product 2,Clothing,$35.49,High-quality product with advanced features and excellent performance,60,BrandB,3.1
+2003,Premium Product 3,Home & Garden,$50.99,High-quality product with advanced features and excellent performance,70,BrandC,3.2
+2004,Premium Product 4,Books,$66.49,High-quality product with advanced features and excellent performance,80,BrandD,3.3
+2005,Premium Product 5,Sports,$81.99,High-quality product with advanced features and excellent performance,90,BrandE,3.4
+2006,Premium Product 6,Beauty,$97.49,High-quality product with advanced features and excellent performance,100,BrandF,3.5
+2007,Premium Product 7,Electronics,$112.99,High-quality product with advanced features and excellent performance,110,BrandG,3.6
+2008,Premium Product 8,Clothing,$128.49,High-quality product with advanced features and excellent performance,120,BrandH,3.7
+2009,Premium Product 9,Home & Garden,$143.99,High-quality product with advanced features and excellent performance,130,BrandI,3.8
+2010,Premium Product 10,Books,$159.49,High-quality product with advanced features and excellent performance,140,BrandJ,3.9
+2011,Premium Product 11,Sports,$174.99,High-quality product with advanced features and excellent performance,150,BrandK,4.0
+2012,Premium Product 12,Beauty,$190.49,High-quality product with advanced features and excellent performance,160,BrandL,4.1
+2013,Premium Product 13,Electronics,$205.99,High-quality product with advanced features and excellent performance,170,BrandM,4.2
+2014,Premium Product 14,Clothing,$221.49,High-quality product with advanced features and excellent performance,180,BrandN,4.3
+2015,Premium Product 15,Home & Garden,$236.99,High-quality product with advanced features and excellent performance,190,BrandO,4.4
+2016,Premium Product 16,Books,$252.49,High-quality product with advanced features and excellent performance,200,BrandP,4.5
+2017,Premium Product 17,Sports,$267.99,High-quality product with advanced features and excellent performance,210,BrandQ,4.6
+2018,Premium Product 18,Beauty,$283.49,High-quality product with advanced features and excellent performance,220,BrandR,4.7
+2019,Premium Product 19,Electronics,$298.99,High-quality product with advanced features and excellent performance,230,BrandS,4.8
+2020,Premium Product 20,Clothing,$314.49,High-quality product with advanced features and excellent performance,240,BrandT,4.9
