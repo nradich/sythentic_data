@@ -131,16 +131,16 @@ DATASET_CONFIG = {
     "customers": {
         "schema": CUSTOMER_SCHEMA,
         "record_count": 20,
-        "filename": "customers.csv"
+        "filename": "customers.json"
     },
     "products": {
         "schema": PRODUCT_SCHEMA, 
         "record_count": 20,
-        "filename": "products.csv"
+        "filename": "products.json"
     },
     "orders": {
         "schema": ORDER_SCHEMA,
         "record_count": 30,
-        "filename": "orders.csv"
+        "filename": "orders.json"
     }
 }

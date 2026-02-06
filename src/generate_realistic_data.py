@@ -165,7 +165,7 @@ def create_enhanced_sample_data(schema, record_count, dataset_name):
     
     return sample_data
 
-def save_to_csv(data, filename, output_dir):
+def save_to_json(data, filename, output_dir):
     """Save generated data to CSV file"""
     
     if not data:
@@ -176,7 +176,7 @@ def save_to_csv(data, filename, output_dir):
     
     try:
         df = pd.DataFrame(data)
-        df.to_csv(output_path, index=False)
+        df.to_json(output_path, orient='records', indent=2)
         print(f"✅ Saved {len(data)} records to {output_path}")
         
         # Show sample of generated data
@@ -220,7 +220,7 @@ def main():
         data = generate_realistic_dataset(client, dataset_name, config)
         
         if data:
-            success = save_to_csv(data, config["filename"], output_dir)
+            success = save_to_json(data, config["filename"], output_dir)
             results[dataset_name] = success
             if success:
                 total_records += len(data)

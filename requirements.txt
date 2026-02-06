@@ -1,3 +1,4 @@
 nemo-microservices[data-designer]
 python-dotenv
 pandas
+azure-storage-blob
