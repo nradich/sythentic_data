@@ -21,3 +21,11 @@ Will then need to create an init script and odbc driver so we can insert into th
 
 Pulled in repo to databricks. 
 Need to work through authentication of DBX to ADLS and can then write files there. 
+
+2.6.2026
+Trying to get DBX hooked up to ADLS for both read and write
+Can then have the synthentic data ingestion go to json, will need a secret in the key vault as well 
+
+Don't have unit catalog within the workspace, and tenant won't let me spin up a service principle.
+So doing the SAS token when I generate a token and store it in keyvault
+That worked, created SAS token in ADLS, and feed it to DBX secret scope
