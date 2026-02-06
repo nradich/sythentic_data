@@ -29,3 +29,6 @@ Can then have the synthentic data ingestion go to json, will need a secret in th
 Don't have unit catalog within the workspace, and tenant won't let me spin up a service principle.
 So doing the SAS token when I generate a token and store it in keyvault
 That worked, created SAS token in ADLS, and feed it to DBX secret scope
+
+Had the agent adjust to return json results
+Now need to add the key for nemotron and and the container to the config file 
