@@ -180,6 +180,8 @@ def save_to_adls(data, dataset_name, blob_service_client, container_name):
     blob_name = f"{date_path}/{dataset_name}_{timestamp}.json"
     
     try:
+        print(f"🔄 Uploading {dataset_name} to {blob_name}...")
+        
         df = pd.DataFrame(data)
         json_data = df.to_json(orient='records', indent=2)
         
@@ -187,6 +189,8 @@ def save_to_adls(data, dataset_name, blob_service_client, container_name):
             container=container_name, 
             blob=blob_name
         )
+        
+        print(f"📤 Starting upload to container: {container_name}")
         blob_client.upload_blob(json_data, overwrite=True)
         
         print(f"✅ Uploaded {len(data)} records to {blob_name}")
@@ -199,6 +203,9 @@ def save_to_adls(data, dataset_name, blob_service_client, container_name):
         return True
     except Exception as e:
         print(f"❌ Error uploading {dataset_name}: {e}")
+        print(f"   Container: {container_name}")
+        print(f"   Blob path: {blob_name}")
+        print(f"   Error type: {type(e).__name__}")
         return False
 
 def save_to_json(data, filename, output_dir):
@@ -284,14 +291,22 @@ def main(blob_service_client=None, container_name=None):
     successful_datasets = sum(results.values())
     print(f"\n🎯 Results: {successful_datasets}/{len(results)} datasets generated successfully")
     print(f"📊 Total records: {total_records}")
-    print(f"📁 Output directory: {output_dir}")
+    
+    if use_adls:
+        print(f"📤 Output destination: ADLS container '{container_name}'")
+    else:
+        print(f"📁 Output directory: {output_dir}")
     
     if successful_datasets == len(results):
         print("\n🎉 All datasets generated successfully!")
-        print("Next steps:")
-        print("  • Review the CSV files in the data/ directory")
-        print("  • Load into SQL Server for further analysis") 
-        print("  • Develop Azure Functions for API access")
+        if use_adls:
+            print("✅ Data uploaded to Azure Data Lake Storage with date partitioning")
+        else:
+            print("Next steps:")
+            print("  • Review the JSON files in the data/ directory")
+            print("  • Upload to Azure Data Lake Storage")
+    
+    return successful_datasets == len(results)
 
 if __name__ == "__main__":
     main()
