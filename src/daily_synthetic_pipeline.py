@@ -9,24 +9,27 @@ import json
 from datetime import datetime
 from pathlib import Path
 from azure.storage.blob import BlobServiceClient
-from config.env import container
+from config.env import container, AZURE_SAS_TOKEN, AZURE_STORAGE_ACCOUNT
 from generate_realistic_data import generate_synthetic_data
 
 
 def get_blob_service_client():
     """
-    Initialize Azure Blob Service Client using Databricks authentication
-    Assumes Databricks is already authenticated to ADLS
+    Initialize Azure Blob Service Client using SAS token from Databricks secret scope
     """
     try:
-        # In Databricks, use the default credential provider
-        from azure.identity import DefaultAzureCredential
-        credential = DefaultAzureCredential()
+        account_url = f"https://{AZURE_STORAGE_ACCOUNT}.blob.core.windows.net"
         
-        # You'll need to replace this with your storage account name
-        account_url = f"https://your-storage-account.blob.core.windows.net"
-        
-        return BlobServiceClient(account_url=account_url, credential=credential)
+        if AZURE_SAS_TOKEN and AZURE_SAS_TOKEN != "None":
+            # Use SAS token authentication (preferred for Databricks)
+            return BlobServiceClient(account_url=account_url, credential=AZURE_SAS_TOKEN)
+        else:
+            # Fallback to default credential for local development
+            print("⚠️ No SAS token found, using DefaultAzureCredential")
+            from azure.identity import DefaultAzureCredential
+            credential = DefaultAzureCredential()
+            return BlobServiceClient(account_url=account_url, credential=credential)
+            
     except Exception as e:
         print(f"❌ Error initializing Azure client: {e}")
         raise
