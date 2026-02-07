@@ -48,26 +48,14 @@ def get_secret_from_env(key: str, default: str = None) -> str:
     
     return value
 
-# Try to get secrets from Databricks first, then fall back to environment variables
-NVIDIA_API_KEY = (
-    get_secret_from_databricks(SCOPE_NAME, "nvidiaapi") or 
-    get_secret_from_env("NVIDIA_API_KEY", "your_nvidia_api_key_here")
-)
+# Get secrets directly from Databricks secret scope only
+NVIDIA_API_KEY = get_secret_from_databricks(SCOPE_NAME, "nvidiaapi")
 
-AZURE_CONTAINER_NAME = (
-    get_secret_from_databricks(SCOPE_NAME, "synthenticstorage") or 
-    get_secret_from_env("AZURE_CONTAINER_NAME", "synthenticstorage")
-)
+AZURE_STORAGE_ACCOUNT = get_secret_from_databricks(SCOPE_NAME, "synthenticstorage")
 
-AZURE_SAS_TOKEN = (
-    get_secret_from_databricks(SCOPE_NAME, "adls-sas-token") or 
-    get_secret_from_env("AZURE_SAS_TOKEN", None)
-)
+AZURE_SAS_TOKEN = get_secret_from_databricks(SCOPE_NAME, "adls-sas-token")
 
-AZURE_STORAGE_ACCOUNT = (
-    get_secret_from_databricks(SCOPE_NAME, "adls-storage-account") or 
-    get_secret_from_env("AZURE_STORAGE_ACCOUNT", "your-storage-account")
-)
+AZURE_CONTAINER_NAME = "synthenticstorage"
 
 # Legacy support - keeping original variable names available for backward compatibility
 key = NVIDIA_API_KEY
