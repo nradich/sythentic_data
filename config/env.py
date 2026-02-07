@@ -59,6 +59,16 @@ AZURE_CONTAINER_NAME = (
     get_secret_from_env("AZURE_CONTAINER_NAME", "synthenticstorage")
 )
 
+AZURE_SAS_TOKEN = (
+    get_secret_from_databricks(SCOPE_NAME, "adls-sas-token") or 
+    get_secret_from_env("AZURE_SAS_TOKEN", None)
+)
+
+AZURE_STORAGE_ACCOUNT = (
+    get_secret_from_databricks(SCOPE_NAME, "adls-storage-account") or 
+    get_secret_from_env("AZURE_STORAGE_ACCOUNT", "your-storage-account")
+)
+
 # Legacy support - keeping original variable names available for backward compatibility
 key = NVIDIA_API_KEY
 container = AZURE_CONTAINER_NAME
