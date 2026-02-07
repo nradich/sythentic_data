@@ -129,8 +129,7 @@ def run_daily_pipeline():
     print("🚀 Starting daily synthetic data pipeline...")
     
     # Generate synthetic data (creates JSON files in data/ directory)
-    output_dir = "data"
-    success = generate_synthetic_data(output_dir=output_dir)
+    success = generate_synthetic_data()
     
     if not success:
         print("❌ Data generation failed, aborting pipeline")
