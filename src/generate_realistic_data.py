@@ -189,7 +189,7 @@ def save_to_json(data, filename, output_dir):
         print(f"❌ Error saving {filename}: {e}")
         return False
 
-def main():
+def main(blob_service_client=None, container_name=None):
     """Main function to generate all e-commerce datasets"""
     
     print("🚀 Enhanced E-commerce Synthetic Data Generation")
@@ -203,11 +203,16 @@ def main():
         print(f"🤖 Using model: {NEMOTRON_30B_MODEL}")
     except Exception as e:
         print(f"❌ Failed to initialize client: {e}")
-        return
+        return False
     
-    # Create output directory
-    output_dir = Path(__file__).parent.parent / "data"
-    output_dir.mkdir(exist_ok=True)
+    # Determine output mode
+    use_adls = blob_service_client is not None and container_name is not None
+    if use_adls:
+        print(f"📤 Direct upload mode: Writing to ADLS container '{container_name}'")
+    else:
+        print("📁 Local file mode: Creating data/ directory")
+        output_dir = Path(__file__).parent.parent / "data"
+        output_dir.mkdir(exist_ok=True)
     
     # Generate each dataset
     results = {}
@@ -220,7 +225,11 @@ def main():
         data = generate_realistic_dataset(client, dataset_name, config)
         
         if data:
-            success = save_to_json(data, config["filename"], output_dir)
+            # Save data to ADLS or local file based on mode
+            if use_adls:
+                success = save_to_adls(data, dataset_name, blob_service_client, container_name)
+            else:
+                success = save_to_json(data, config["filename"], output_dir)
             results[dataset_name] = success
             if success:
                 total_records += len(data)

@@ -124,49 +124,26 @@ def upload_json_to_adls(file_path, dataset_name, blob_service_client):
 
 def run_daily_pipeline():
     """
-    Main pipeline function: Generate synthetic data and upload to ADLS
+    Main pipeline function: Generate synthetic data and upload directly to ADLS
     """
     print("🚀 Starting daily synthetic data pipeline...")
     
-    # Generate synthetic data (creates JSON files in data/ directory)
-    success = generate_synthetic_data()
-    
-    if not success:
-        print("❌ Data generation failed, aborting pipeline")
-        return False
-    
-    # Initialize Azure client
+    # Initialize Azure client first
     try:
         blob_service_client = get_blob_service_client()
+        print(f"✅ Azure client initialized for storage account: {AZURE_STORAGE_ACCOUNT}")
     except Exception as e:
         print(f"❌ Failed to initialize Azure client: {e}")
         return False
     
-    # Upload each dataset to ADLS
-    datasets = ["customers", "products", "orders"]
-    upload_results = []
+    # Generate synthetic data and upload directly to ADLS
+    success = generate_synthetic_data(blob_service_client, container)
     
-    for dataset in datasets:
-        json_file = Path(output_dir) / f"{dataset}.json"
-        
-        if json_file.exists():
-            result = upload_json_to_adls(json_file, dataset, blob_service_client)
-            upload_results.append(result)
-        else:
-            print(f"❌ JSON file not found: {json_file}")
-            upload_results.append(False)
-    
-    # Summary
-    successful_uploads = sum(upload_results)
-    total_datasets = len(datasets)
-    
-    print(f"📊 Pipeline Summary: {successful_uploads}/{total_datasets} datasets uploaded successfully")
-    
-    if successful_uploads == total_datasets:
+    if success:
         print("✅ Daily pipeline completed successfully!")
         return True
     else:
-        print("⚠️ Pipeline completed with errors")
+        print("❌ Pipeline completed with errors")
         return False
 
 
