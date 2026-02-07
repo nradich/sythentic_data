@@ -32,3 +32,5 @@ That worked, created SAS token in ADLS, and feed it to DBX secret scope
 
 Had the agent adjust to return json results
 Now need to add the key for nemotron and and the container to the config file 
+
+Tried to have it write to ADLS, couldn't get it working. Will need to use a different setup to test. 
