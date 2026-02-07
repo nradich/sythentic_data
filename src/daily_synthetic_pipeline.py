@@ -9,7 +9,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 from azure.storage.blob import BlobServiceClient
-from env import container
+from config.env import container
 from generate_realistic_data import generate_synthetic_data
 
 

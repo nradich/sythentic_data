@@ -2,3 +2,5 @@ nemo-microservices[data-designer]
 python-dotenv
 pandas
 azure-storage-blob
+azure-keyvault-secrets
+azure-identity
