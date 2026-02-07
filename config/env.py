@@ -56,7 +56,7 @@ NVIDIA_API_KEY = (
 
 AZURE_CONTAINER_NAME = (
     get_secret_from_databricks(SCOPE_NAME, "synthenticstorage") or 
-    get_secret_from_env("AZURE_CONTAINER_NAME", "synthentic_storage")
+    get_secret_from_env("AZURE_CONTAINER_NAME", "synthenticstorage")
 )
 
 # Legacy support - keeping original variable names available for backward compatibility
