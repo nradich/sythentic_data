@@ -165,6 +165,42 @@ def create_enhanced_sample_data(schema, record_count, dataset_name):
     
     return sample_data
 
+def save_to_adls(data, dataset_name, blob_service_client, container_name):
+    """Save generated data directly to ADLS with date partitioning"""
+    from datetime import datetime
+    
+    if not data:
+        print(f"No data to save for {dataset_name}")
+        return False
+    
+    # Create date-partitioned path
+    now = datetime.now()
+    date_path = f"{dataset_name}/{now.year:04d}/{now.month:02d}/{now.day:02d}"
+    timestamp = now.strftime("%Y%m%d_%H%M")
+    blob_name = f"{date_path}/{dataset_name}_{timestamp}.json"
+    
+    try:
+        df = pd.DataFrame(data)
+        json_data = df.to_json(orient='records', indent=2)
+        
+        blob_client = blob_service_client.get_blob_client(
+            container=container_name, 
+            blob=blob_name
+        )
+        blob_client.upload_blob(json_data, overwrite=True)
+        
+        print(f"✅ Uploaded {len(data)} records to {blob_name}")
+        
+        # Show sample of generated data
+        print(f"📋 Sample data preview for {dataset_name}:")
+        print(df.head(3).to_string(index=False))
+        print()
+        
+        return True
+    except Exception as e:
+        print(f"❌ Error uploading {dataset_name}: {e}")
+        return False
+
 def save_to_json(data, filename, output_dir):
     """Save generated data to CSV file"""
     
