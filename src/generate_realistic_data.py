@@ -75,7 +75,7 @@ Return only CSV data with headers, no extra text."""
         
         # Make API call to generate data using simple text generation
         response = client.text(
-            model=NEMOTRON_30B_MODEL,Starting Spark write to ADLS Gen2...
+            model=NEMOTRON_30B_MODEL,
             prompt=prompt,
             max_tokens=2000,
             temperature=0.7
