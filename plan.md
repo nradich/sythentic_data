@@ -258,7 +258,8 @@ The initial ADLS implementation used Azure Blob Storage operations (`BlobService
 
 #### Key Changes Made:
 
-1. **Container Update**: Changed container name from `"synthenticstorage"` to `"data_design"`
+1. **Container Update**: Changed container name from `"synthenticstorage"` to `"datadesign"`
+   - **Note**: ADLS Gen2 does not like underscores in container names
 
 2. **Protocol Switch**: 
    - **Before**: `https://{storage_account}.blob.core.windows.net` (blob operations)
