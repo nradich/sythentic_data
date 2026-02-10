@@ -74,7 +74,7 @@ Requirements:
 Return only CSV data with headers, no extra text."""
         
         # Make API call to generate data
-        response = client.completions(
+        response = client.chat(
             model=NEMOTRON_30B_MODEL,
             messages=[{"role": "user", "content": prompt}],
             max_tokens=2000,
@@ -191,12 +191,6 @@ def save_to_adls_spark(data, dataset_name, abfss_base_path, spark_session):
         df_spark.coalesce(1).write.mode("overwrite").json(output_path)
         
         print(f"✅ Wrote {len(data)} records to {output_path}")
-        
-        # Show sample of generated data
-        print(f"📋 Sample data preview for {dataset_name}:")
-        sample_df = pd.DataFrame(data)
-        print(sample_df.head(3).to_string(index=False))
-        print()
         
         return True
     except Exception as e:
