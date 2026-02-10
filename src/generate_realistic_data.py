@@ -73,17 +73,17 @@ Requirements:
 
 Return only CSV data with headers, no extra text."""
         
-        # Make API call to generate data
-        response = client.chat(
-            model=NEMOTRON_30B_MODEL,
-            messages=[{"role": "user", "content": prompt}],
+        # Make API call to generate data using simple text generation
+        response = client.text(
+            model=NEMOTRON_30B_MODEL,Starting Spark write to ADLS Gen2...
+            prompt=prompt,
             max_tokens=2000,
             temperature=0.7
         )
         
         # Parse the response to extract CSV data
-        if response and hasattr(response, 'choices') and len(response.choices) > 0:
-            csv_content = response.choices[0].message.content.strip()
+        if response and hasattr(response, 'text'):
+            csv_content = response.text.strip()
             
             # Parse CSV content into list of dictionaries
             lines = csv_content.split('\n')
@@ -173,12 +173,13 @@ def save_to_adls_spark(data, dataset_name, abfss_base_path, spark_session):
         print(f"No data to save for {dataset_name}")
         return False
 
-    # Create date-partitioned path with abfss:// protocol (directory path, not filename)
+    # Create date-partitioned path with abfss:// protocol
     now = datetime.now()
     date_path = f"{dataset_name}/{now.year:04d}/{now.month:02d}/{now.day:02d}"
     timestamp = now.strftime("%Y%m%d_%H%M")
-    # Spark writes to directory, not specific filename
-    output_path = f"{abfss_base_path}{date_path}/{dataset_name}_{timestamp}"
+    # Ensure no .json extension on the filename
+    filename = f"{dataset_name}_{timestamp}".replace('.json', '')
+    output_path = f"{abfss_base_path}{date_path}/{filename}"
 
     try:
         print(f"🔄 Writing {dataset_name} to {output_path}...")
@@ -187,8 +188,10 @@ def save_to_adls_spark(data, dataset_name, abfss_base_path, spark_session):
         df_spark = spark_session.createDataFrame(pd.DataFrame(data))
         
         print(f"📤 Starting Spark write to ADLS Gen2...")
-        # Write as single JSON file using coalesce(1) to avoid partitioning
-        df_spark.coalesce(1).write.mode("overwrite").json(output_path)
+        # Write JSON following the specified pattern
+        df_spark.write \
+            .mode("append") \
+            .json(output_path)
         
         print(f"✅ Wrote {len(data)} records to {output_path}")
         
