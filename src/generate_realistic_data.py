@@ -165,46 +165,42 @@ def create_enhanced_sample_data(schema, record_count, dataset_name):
     
     return sample_data
 
-def save_to_adls(data, dataset_name, blob_service_client, container_name):
-    """Save generated data directly to ADLS with date partitioning"""
+def save_to_adls_spark(data, dataset_name, abfss_base_path, spark_session):
+    """Save generated data directly to ADLS using Spark DataFrame operations with abfss:// protocol"""
     from datetime import datetime
     
     if not data:
         print(f"No data to save for {dataset_name}")
         return False
-    
-    # Create date-partitioned path
+
+    # Create date-partitioned path with abfss:// protocol
     now = datetime.now()
     date_path = f"{dataset_name}/{now.year:04d}/{now.month:02d}/{now.day:02d}"
     timestamp = now.strftime("%Y%m%d_%H%M")
-    blob_name = f"{date_path}/{dataset_name}_{timestamp}.json"
-    
+    file_path = f"{abfss_base_path}{date_path}/{dataset_name}_{timestamp}.json"
+
     try:
-        print(f"🔄 Uploading {dataset_name} to {blob_name}...")
+        print(f"🔄 Writing {dataset_name} to {file_path}...")
         
-        df = pd.DataFrame(data)
-        json_data = df.to_json(orient='records', indent=2)
+        # Create Spark DataFrame from data
+        df_spark = spark_session.createDataFrame(pd.DataFrame(data))
         
-        blob_client = blob_service_client.get_blob_client(
-            container=container_name, 
-            blob=blob_name
-        )
+        print(f"📤 Starting Spark write to ADLS Gen2...")
+        # Write as single JSON file using coalesce(1) to avoid partitioning
+        df_spark.coalesce(1).write.mode("overwrite").json(file_path)
         
-        print(f"📤 Starting upload to container: {container_name}")
-        blob_client.upload_blob(json_data, overwrite=True)
-        
-        print(f"✅ Uploaded {len(data)} records to {blob_name}")
+        print(f"✅ Wrote {len(data)} records to {file_path}")
         
         # Show sample of generated data
         print(f"📋 Sample data preview for {dataset_name}:")
-        print(df.head(3).to_string(index=False))
+        sample_df = pd.DataFrame(data)
+        print(sample_df.head(3).to_string(index=False))
         print()
         
         return True
     except Exception as e:
-        print(f"❌ Error uploading {dataset_name}: {e}")
-        print(f"   Container: {container_name}")
-        print(f"   Blob path: {blob_name}")
+        print(f"❌ Error writing {dataset_name}: {e}")
+        print(f"   ABFSS path: {file_path}")
         print(f"   Error type: {type(e).__name__}")
         return False
 
@@ -232,7 +228,7 @@ def save_to_json(data, filename, output_dir):
         print(f"❌ Error saving {filename}: {e}")
         return False
 
-def main(blob_service_client=None, container_name=None):
+def main(spark_session=None, abfss_base_path=None):
     """Main function to generate all e-commerce datasets"""
     
     print("🚀 Enhanced E-commerce Synthetic Data Generation")
@@ -249,9 +245,9 @@ def main(blob_service_client=None, container_name=None):
         return False
     
     # Determine output mode
-    use_adls = blob_service_client is not None and container_name is not None
+    use_adls = spark_session is not None and abfss_base_path is not None
     if use_adls:
-        print(f"📤 Direct upload mode: Writing to ADLS container '{container_name}'")
+        print(f"📤 Spark ADLS mode: Writing to {abfss_base_path}")
     else:
         print("📁 Local file mode: Creating data/ directory")
         output_dir = Path(__file__).parent.parent / "data"
@@ -268,9 +264,9 @@ def main(blob_service_client=None, container_name=None):
         data = generate_realistic_dataset(client, dataset_name, config)
         
         if data:
-            # Save data to ADLS or local file based on mode
+            # Save data to ADLS using Spark or local file based on mode
             if use_adls:
-                success = save_to_adls(data, dataset_name, blob_service_client, container_name)
+                success = save_to_adls_spark(data, dataset_name, abfss_base_path, spark_session)
             else:
                 success = save_to_json(data, config["filename"], output_dir)
             results[dataset_name] = success
