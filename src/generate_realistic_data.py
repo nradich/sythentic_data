@@ -290,7 +290,7 @@ def main(spark_session=None, abfss_base_path=None):
     print(f"📊 Total records: {total_records}")
     
     if use_adls:
-        print(f"📤 Output destination: ADLS container '{container_name}'")
+        print(f"📤 Output destination: ADLS Gen2 via Spark")
     else:
         print(f"📁 Output directory: {output_dir}")
     
