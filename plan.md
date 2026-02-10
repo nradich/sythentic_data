@@ -247,3 +247,49 @@ container/
 - **Scalable**: Ready for daily automated execution and larger datasets
 
 This enhancement bridges the synthetic data generation with modern cloud data lake patterns, enabling seamless integration with downstream analytics and ML workflows in the Azure ecosystem.
+
+## Recent ADLS Gen2 & Spark Optimization ✅
+
+### Issue Identified
+The initial ADLS implementation used Azure Blob Storage operations (`BlobServiceClient`) with `.blob.core.windows.net` endpoints instead of proper ADLS Gen2 file system operations with the hierarchical `abfss://` protocol.
+
+### Solution Implemented
+**Switched from Blob Operations to Spark DataFrame Writes** for optimal ADLS Gen2 integration:
+
+#### Key Changes Made:
+
+1. **Container Update**: Changed container name from `"synthenticstorage"` to `"data_design"`
+
+2. **Protocol Switch**: 
+   - **Before**: `https://{storage_account}.blob.core.windows.net` (blob operations)
+   - **After**: `abfss://data_design@{storage_account}.dfs.core.windows.net` (ADLS Gen2 native)
+
+3. **Client Architecture Refactor**:
+   - **Removed**: `BlobServiceClient` and `blob_client.upload_blob()` operations
+   - **Added**: Spark DataFrame operations with `df_spark.coalesce(1).write.mode("overwrite").json()`
+
+4. **Function Signature Updates**:
+   - `main(blob_service_client, container_name)` → `main(spark_session, abfss_base_path)`  
+   - `save_to_adls()` → `save_to_adls_spark()` with native Spark operations
+
+5. **Pipeline Simplification**: 
+   - Leverages existing `configure_spark_adls_access()` function
+   - Removes redundant blob client initialization
+   - Direct Spark-to-ADLS Gen2 file writing
+
+#### Technical Benefits:
+- **Native ADLS Gen2**: Utilizes hierarchical file system instead of blob object storage
+- **Spark Optimized**: Takes advantage of Databricks' optimized ADLS integration  
+- **Better Performance**: Spark's distributed writing vs single-threaded blob uploads
+- **Simplified Authentication**: Uses existing Spark ADLS configuration with SAS tokens
+- **Analytics Ready**: Files written in format optimized for downstream Spark analytics
+
+#### File Path Format:
+```
+abfss://data_design@{storage_account}.dfs.core.windows.net/
+├── customers/2026/02/09/customers_20260209_1425.json
+├── products/2026/02/09/products_20260209_1425.json  
+└── orders/2026/02/09/orders_20260209_1425.json
+```
+
+This optimization aligns the implementation with modern lakehouse architecture best practices, ensuring optimal performance and compatibility with Azure analytics services.

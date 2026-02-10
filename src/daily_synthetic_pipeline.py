@@ -8,7 +8,7 @@ import os
 import json
 from datetime import datetime
 from pathlib import Path
-from config.env import container, AZURE_SAS_TOKEN, AZURE_STORAGE_ACCOUNT
+from config.env import AZURE_CONTAINER_NAME, AZURE_SAS_TOKEN, AZURE_STORAGE_ACCOUNT
 from generate_realistic_data import main as generate_synthetic_data
 
 
@@ -50,7 +50,7 @@ def configure_spark_adls_access(spark_session=None):
             )
             
             # Define ABFSS base path for easy access
-            base_path = f"abfss://{container}@{storage_account}.dfs.core.windows.net/"
+            base_path = f"abfss://{AZURE_CONTAINER_NAME}@{storage_account}.dfs.core.windows.net/"
             
             print(f"✅ Spark ADLS configuration complete: {base_path}")
             return base_path

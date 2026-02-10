@@ -74,9 +74,9 @@ Requirements:
 Return only CSV data with headers, no extra text."""
         
         # Make API call to generate data
-        response = client.generate_data(
+        response = client.completions(
             model=NEMOTRON_30B_MODEL,
-            prompt=prompt,
+            messages=[{"role": "user", "content": prompt}],
             max_tokens=2000,
             temperature=0.7
         )
@@ -173,23 +173,24 @@ def save_to_adls_spark(data, dataset_name, abfss_base_path, spark_session):
         print(f"No data to save for {dataset_name}")
         return False
 
-    # Create date-partitioned path with abfss:// protocol
+    # Create date-partitioned path with abfss:// protocol (directory path, not filename)
     now = datetime.now()
     date_path = f"{dataset_name}/{now.year:04d}/{now.month:02d}/{now.day:02d}"
     timestamp = now.strftime("%Y%m%d_%H%M")
-    file_path = f"{abfss_base_path}{date_path}/{dataset_name}_{timestamp}.json"
+    # Spark writes to directory, not specific filename
+    output_path = f"{abfss_base_path}{date_path}/{dataset_name}_{timestamp}"
 
     try:
-        print(f"🔄 Writing {dataset_name} to {file_path}...")
+        print(f"🔄 Writing {dataset_name} to {output_path}...")
         
         # Create Spark DataFrame from data
         df_spark = spark_session.createDataFrame(pd.DataFrame(data))
         
         print(f"📤 Starting Spark write to ADLS Gen2...")
         # Write as single JSON file using coalesce(1) to avoid partitioning
-        df_spark.coalesce(1).write.mode("overwrite").json(file_path)
+        df_spark.coalesce(1).write.mode("overwrite").json(output_path)
         
-        print(f"✅ Wrote {len(data)} records to {file_path}")
+        print(f"✅ Wrote {len(data)} records to {output_path}")
         
         # Show sample of generated data
         print(f"📋 Sample data preview for {dataset_name}:")
@@ -200,7 +201,7 @@ def save_to_adls_spark(data, dataset_name, abfss_base_path, spark_session):
         return True
     except Exception as e:
         print(f"❌ Error writing {dataset_name}: {e}")
-        print(f"   ABFSS path: {file_path}")
+        print(f"   ABFSS path: {output_path}")
         print(f"   Error type: {type(e).__name__}")
         return False
 
