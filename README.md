@@ -34,3 +34,16 @@ Had the agent adjust to return json results
 Now need to add the key for nemotron and and the container to the config file 
 
 Tried to have it write to ADLS, couldn't get it working. Will need to use a different setup to test. 
+
+2.9
+Adjusted to use abfss filepath as opposed to blob
+Had to create the folder first within the ADLs, then it could write 
+Schedule in DBX with job cluster
+
+Tomorrow create autoloader pipeline to transform json to table. then load into SQL server via ODBC driver. 
+Then front end stuff..with azure functions 
+Will probably use line complete for the autoloader pipeline to keep agent request down for front end. 
+
+3.4
+Will not craft autoloader pipelin to write into the SQL server.
+Can then have a fast api. read the tables
