@@ -4,3 +4,4 @@ pandas
 azure-storage-blob
 azure-keyvault-secrets
 azure-identity
+pyodbc

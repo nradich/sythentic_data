@@ -47,3 +47,51 @@ Will probably use line complete for the autoloader pipeline to keep agent reques
 3.4
 Will not craft autoloader pipelin to write into the SQL server.
 Can then have a fast api. read the tables
+
+## Auto Loader to SQL Server Pipeline
+
+Implemented Databricks ingestion and publish scripts:
+
+- `src/autoloader_bronze.py`:
+	- Reads JSON files incrementally using Auto Loader (`cloudFiles`)
+	- Writes Bronze Delta with durable schema/checkpoint locations
+	- Uses `availableNow=True` for scheduled backfill-style execution
+- `src/sqlserver_publish.py`:
+	- Reads Bronze Delta incrementally using `_ingest_timestamp` watermark
+	- Upserts into SQL Server tables via ODBC (`pyodbc`, Driver 18)
+	- Stores watermark state in `dbo.ingestion_watermark`
+- `src/autoloader_to_sql_pipeline.py`:
+	- Orchestrates Bronze ingestion, then SQL publish
+
+### Required Secrets / Environment
+
+Databricks secret scope (`adls-scope`) keys:
+- `synthenticstorage`
+- `adls-sas-token`
+- `sql-server-host`
+- `sql-server-database`
+- `sql-server-username`
+- `sql-server-password`
+
+Optional env overrides:
+- `SQL_SERVER_PORT` (default `1433`)
+- `SQL_TABLE_CUSTOMERS` (default `syn_data.customers`)
+- `SQL_TABLE_PRODUCTS` (default `syn_data.products`)
+- `SQL_TABLE_ORDERS` (default `syn_data.orders`)
+
+### How to Run (Databricks)
+
+1. Attach init script `init-scripts/install-nemo.sh` to the job cluster (this installs ODBC Driver 18 + Python deps).
+2. Install repo dependencies (`pip install -r requirements.txt`).
+3. Run end-to-end pipeline:
+
+```bash
+python src/autoloader_to_sql_pipeline.py
+```
+
+Or run in two phases:
+
+```bash
+python src/autoloader_bronze.py
+python src/sqlserver_publish.py
+```
