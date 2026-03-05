@@ -13,15 +13,11 @@ from pyspark.sql.window import Window
 from config.env import (
     AZURE_CONTAINER_NAME,
     AZURE_STORAGE_ACCOUNT,
-    SQL_SERVER_DATABASE,
-    SQL_SERVER_HOST,
-    SQL_SERVER_PASSWORD,
-    SQL_SERVER_PORT,
-    SQL_SERVER_USERNAME,
     SQL_TABLE_CUSTOMERS,
     SQL_TABLE_ORDERS,
     SQL_TABLE_PRODUCTS,
     SQL_WATERMARK_TABLE,
+    get_sql_server_config,
 )
 from daily_synthetic_pipeline import configure_spark_adls_access
 
@@ -75,12 +71,12 @@ DATASET_SQL_CONFIG: Dict[str, Dict] = {
 }
 
 
-def _validate_sql_config() -> None:
+def _validate_sql_config(sql_config: Dict[str, str]) -> None:
     required = {
-        "SQL_SERVER_HOST": SQL_SERVER_HOST,
-        "SQL_SERVER_DATABASE": SQL_SERVER_DATABASE,
-        "SQL_SERVER_USERNAME": SQL_SERVER_USERNAME,
-        "SQL_SERVER_PASSWORD": SQL_SERVER_PASSWORD,
+        "SQL_SERVER_HOST": sql_config.get("host"),
+        "SQL_SERVER_DATABASE": sql_config.get("database"),
+        "SQL_SERVER_USERNAME": sql_config.get("username"),
+        "SQL_SERVER_PASSWORD": sql_config.get("password"),
     }
     missing = [name for name, value in required.items() if not value]
     if missing:
@@ -109,13 +105,13 @@ def _table_object_id_literal(table_name: str) -> str:
     return f"{schema_name}.{object_name}"
 
 
-def _connection() -> pyodbc.Connection:
+def _connection(sql_config: Dict[str, str]) -> pyodbc.Connection:
     connection_string = (
         "DRIVER={ODBC Driver 18 for SQL Server};"
-        f"SERVER={SQL_SERVER_HOST},{SQL_SERVER_PORT};"
-        f"DATABASE={SQL_SERVER_DATABASE};"
-        f"UID={SQL_SERVER_USERNAME};"
-        f"PWD={SQL_SERVER_PASSWORD};"
+        f"SERVER={sql_config['host']},{sql_config.get('port', '1433')};"
+        f"DATABASE={sql_config['database']};"
+        f"UID={sql_config['username']};"
+        f"PWD={sql_config['password']};"
         "Encrypt=yes;"
         "TrustServerCertificate=no;"
         "Connection Timeout=30;"
@@ -272,15 +268,16 @@ def _publish_dataset(cursor: pyodbc.Cursor, spark: SparkSession, dataset_name: s
 
 
 def run_sqlserver_publish() -> None:
-    _validate_sql_config()
-
     spark = SparkSession.getActiveSession()
     if spark is None:
         spark = SparkSession.builder.appName("BronzeToSqlServerPublish").getOrCreate()
 
+    sql_config = get_sql_server_config()
+    _validate_sql_config(sql_config)
+
     configure_spark_adls_access(spark)
 
-    with _connection() as conn:
+    with _connection(sql_config) as conn:
         cursor = conn.cursor()
         _ensure_watermark_table(cursor)
 
