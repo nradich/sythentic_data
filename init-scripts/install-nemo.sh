@@ -16,7 +16,7 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
 apt-get install -y --no-install-recommends curl gnupg apt-transport-https unixodbc unixodbc-dev
 
-# Detect OS codename — fail loudly if missing
+# Detect OS codename and map to Ubuntu version number (Microsoft uses version numbers, not codenames)
 DISTRO_CODENAME=$(. /etc/os-release && echo "${VERSION_CODENAME}")
 if [ -z "$DISTRO_CODENAME" ]; then
     echo "❌ Could not determine OS codename from /etc/os-release"
@@ -24,12 +24,20 @@ if [ -z "$DISTRO_CODENAME" ]; then
 fi
 echo "Detected OS codename: ${DISTRO_CODENAME}"
 
+declare -A VERSION_MAP
+VERSION_MAP["focal"]="20.04"
+VERSION_MAP["jammy"]="22.04"
+VERSION_MAP["noble"]="24.04"
+
+UBUNTU_VERSION="${VERSION_MAP[$DISTRO_CODENAME]:-22.04}"
+echo "Using Ubuntu version: ${UBUNTU_VERSION}"
+
 # Add Microsoft repo and install ODBC Driver 18
 curl -sSL https://packages.microsoft.com/keys/microsoft.asc \
     | gpg --dearmor > /usr/share/keyrings/microsoft-prod.gpg
 
 echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-prod.gpg] \
-https://packages.microsoft.com/ubuntu/${DISTRO_CODENAME}/prod ${DISTRO_CODENAME} main" \
+https://packages.microsoft.com/ubuntu/${UBUNTU_VERSION}/prod ${DISTRO_CODENAME} main" \
     > /etc/apt/sources.list.d/microsoft-prod.list
 
 apt-get update -qq
