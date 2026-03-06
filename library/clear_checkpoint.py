@@ -9,7 +9,9 @@ Usage (Databricks Python script / job task):
 import argparse
 import sys
 
-from config.env import AZURE_CONTAINER_NAME, AZURE_STORAGE_ACCOUNT
+from pyspark.sql import SparkSession
+
+from config.env import AZURE_CONTAINER_NAME, AZURE_STORAGE_ACCOUNT, AZURE_SAS_TOKEN
 
 DATASETS = ["customers", "products", "orders"]
 
@@ -19,12 +21,22 @@ def get_checkpoint_path(dataset_name: str) -> str:
     return f"{base}/_autoloader/checkpoints/{dataset_name}"
 
 
-def clear_checkpoint(dataset_name: str) -> None:
-    try:
-        dbutils  # noqa: F821 — available in Databricks runtime
-    except NameError:
-        raise RuntimeError("dbutils is not available. Run this script inside a Databricks environment.")
+def configure_adls(spark: SparkSession) -> None:
+    """Set SAS token auth on the active Spark session so dbutils.fs can reach ADLS."""
+    spark.conf.set(
+        f"fs.azure.account.auth.type.{AZURE_STORAGE_ACCOUNT}.dfs.core.windows.net", "SAS"
+    )
+    spark.conf.set(
+        f"fs.azure.sas.token.provider.type.{AZURE_STORAGE_ACCOUNT}.dfs.core.windows.net",
+        "org.apache.hadoop.fs.azurebfs.sas.FixedSASTokenProvider",
+    )
+    spark.conf.set(
+        f"fs.azure.sas.fixed.token.{AZURE_STORAGE_ACCOUNT}.dfs.core.windows.net",
+        AZURE_SAS_TOKEN,
+    )
 
+
+def clear_checkpoint(dataset_name: str) -> None:
     path = get_checkpoint_path(dataset_name)
     print(f"Clearing checkpoint: {path}")
     dbutils.fs.rm(path, recurse=True)  # noqa: F821
@@ -37,6 +49,11 @@ def main(dataset: str) -> None:
     if dataset != "all" and dataset not in DATASETS:
         print(f"Unknown dataset '{dataset}'. Valid options: {DATASETS + ['all']}")
         sys.exit(1)
+
+    spark = SparkSession.getActiveSession()
+    if spark is None:
+        spark = SparkSession.builder.appName("ClearCheckpoint").getOrCreate()
+    configure_adls(spark)
 
     for name in targets:
         clear_checkpoint(name)
