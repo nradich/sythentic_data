@@ -1,12 +1,9 @@
 """
 Clear Auto Loader checkpoint for a specific dataset.
 
-Usage (Databricks notebook):
-    %run ./library/clear_checkpoint --dataset customers
-
-Usage (CLI / dbx):
+Usage (Databricks Python script / job task):
+    python clear_checkpoint.py                   # clears all datasets
     python clear_checkpoint.py --dataset customers
-    python clear_checkpoint.py --dataset all
 """
 
 import argparse
@@ -47,6 +44,10 @@ def main(dataset: str) -> None:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Clear Auto Loader checkpoint for a dataset.")
-    parser.add_argument("--dataset", required=True, help=f"Dataset name or 'all'. Options: {DATASETS}")
-    args = parser.parse_args()
+    parser.add_argument(
+        "--dataset",
+        default="all",
+        help=f"Dataset name or 'all' (default). Options: {DATASETS}",
+    )
+    args, _ = parser.parse_known_args()  # ignore kernel-injected args
     main(args.dataset)
