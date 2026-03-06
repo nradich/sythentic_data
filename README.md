@@ -95,3 +95,11 @@ Or run in two phases:
 python src/autoloader_bronze.py
 python src/sqlserver_publish.py
 ```
+
+## 3.5.2026
+
+- **Bronze output partitioning** — `src/autoloader_bronze.py` now writes Delta partitioned by `_year/_month/_day`, aligning the Bronze layout with the source `YYYY/MM/DD` folder structure used by the synthetic data pipeline.
+- **Checkpoint utility** — added `library/clear_checkpoint.py`, a Databricks Python script that clears Auto Loader checkpoints for one or all datasets. Configures ADLS SAS auth before clearing so `dbutils.fs.rm` can reach the storage account.
+
+
+```

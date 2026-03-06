@@ -67,9 +67,9 @@ def run_dataset_ingestion(spark: SparkSession, dataset_name: str) -> None:
         .withColumn("_ingest_timestamp", current_timestamp())
         .withColumn("_dataset", lit(dataset_name))
         .withColumn("_ingest_run_date", run_date)
-        .withColumn("_year", year(to_date(run_date)))
-        .withColumn("_month", month(to_date(run_date)))
-        .withColumn("_day", dayofmonth(to_date(run_date)))
+        .withColumn("year", year(to_date(run_date)))
+        .withColumn("month", month(to_date(run_date)))
+        .withColumn("day", dayofmonth(to_date(run_date)))
     )
 
     query = (
@@ -77,7 +77,7 @@ def run_dataset_ingestion(spark: SparkSession, dataset_name: str) -> None:
         # Durable checkpoint for exactly-once progression into Bronze Delta.
         .option("checkpointLocation", paths["checkpoint_path"])
         .outputMode("append")
-        .partitionBy("_year", "_month", "_day")
+        .partitionBy("year", "month", "day")
         # Scheduled batch-style trigger: process available files then stop.
         .trigger(availableNow=True)
         .start(paths["bronze_path"])
